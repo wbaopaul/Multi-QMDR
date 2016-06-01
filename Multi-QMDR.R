@@ -121,10 +121,10 @@ dire_ht2 <- function(X, Y, phes){
   T2 <- ((l1 * l2)/(l1 + l2))* (t(m1 - m2) %*% solve(poolS) %*% (m1 - m2) ) 
   
   Fstat <- ((l1 + l2- d - 1) * T2)/((l1 + l2 - 2) * d)
-  pvalue <- pf(Fstat, d, l1 + l2 - d - 1, lower.tail = FALSE)
+  # pvalue <- pf(Fstat, d, l1 + l2 - d - 1, lower.tail = FALSE)
   
   return(list("stat" = round(T2, 4), 
-              "fstat" = round(Fstat, 4), "pv" = pvalue ))
+              "fstat" = round(Fstat, 4) ))
   
 }
 
