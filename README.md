@@ -8,7 +8,7 @@ All source codes were listed in file "Multi-QMDR.R" for implemeting Multi-QMDR
 Yu, Wenbao, M-S. Kwon, and T. Park. "Multivariate Quantitative Multifactor Dimensionality Reduction for Detecting Gene-Gene Interactions." Human heredity 79.3-4 (2015): 168-181.
 
 ## Example 
-Try run_example.R to get a quick start, and an example data was provided too
+Try _run_example.R_ to get a quick start, and an example data was provided too
 
 
 ## Usage
