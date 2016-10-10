@@ -265,7 +265,7 @@ multi_qmdr <- function(phes, snp.mat, method = 'FPC', K = 2, nperm = 1000, test.
   
   perm.pv = NULL
   if(nperm > 0){
-    nperm = max(1, ceiling(nperm/ncol(snp.coms)))
+    nperm = max(1, ceiling(nperm/ns))
     emp_stats_null = emp_null_perm(K, SS, snp.all = snp.mat, 
                                    phes, B = nperm, folds = kfolds, test.type, method)
     perm.pv = mean(ifelse(emp_stats_null > model.score, 1, 0))
