@@ -67,6 +67,8 @@ cal_tstat <- function(ids, high.all, S){
   s2 = S[low.ids]
   
   if(length(high.ids) == 0 || length(low.ids) == 0) return(0)
+  if(length(union(high.ids, low.ids)) <= 2) return(0)
+  
   stat = t.test(s1, y = s2, var.equal = TRUE)$statistic
   
   return(abs(stat))
@@ -214,7 +216,7 @@ emp_null_perm <- function(K, S, snp.all, phes, B = 1000, folds = 10,
       for(j in 1:folds){
         testid = ((j - 1) * cvlen + 1) : (j * cvlen)
         trainid = cc[-testid]
-        temp.result = qmdr(trainid, testid, snp.all, perm.S, perm.phes, test.type, method)
+        temp.result = qmdr(trainid, testid, snp.all[, snp.combs[, j]], perm.S, perm.phes, test.type, method)
         test.stats[i, j] = temp.result$test.stat
       }  
     }
@@ -252,7 +254,7 @@ multi_qmdr <- function(phes, snp.mat, method = 'FPC', K = 2, nperm = 1000, test.
   
   aa = sample(1:n, n)  ## shuffle samples
  
-  result = tune_kmodel(10, snp.mat[aa, ], SS[aa], phes[aa, ], test.type, 
+  result = tune_kmodel(kfolds, snp.mat[aa, ], SS[aa], phes[aa, ], test.type, 
                        sele.type, snp.combs, method)
   
   model.cons = result$cvc
