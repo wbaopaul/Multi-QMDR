@@ -216,7 +216,7 @@ emp_null_perm <- function(K, S, snp.all, phes, B = 1000, folds = 10,
       for(j in 1:folds){
         testid = ((j - 1) * cvlen + 1) : (j * cvlen)
         trainid = cc[-testid]
-        temp.result = qmdr(trainid, testid, snp.all[, snp.combs[, j]], perm.S, perm.phes, test.type, method)
+        temp.result = qmdr(trainid, testid, snp.all[, snp.combs[, i]], perm.S, perm.phes, test.type, method)
         test.stats[i, j] = temp.result$test.stat
       }  
     }
