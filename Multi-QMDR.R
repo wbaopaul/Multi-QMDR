@@ -187,8 +187,8 @@ tune_kmodel <- function(folds = 10, snp.all, S, phes,
 
 
 ## calculate empirical distribution under the null using all pairs
-## this empirical distribution is used to calculate pvalues for all snp
-emp_null_perm <- function(K, S, snp.all, phes, B = 1000, folds = 10, 
+## this empirical distribution is used to calculate pvalues for all snp -- not used
+emp_null_perm0 <- function(K, S, snp.all, phes, B = 1000, folds = 10, 
                        test.type = 'ht2', method){
   set.seed(1234)
   
@@ -226,6 +226,43 @@ emp_null_perm <- function(K, S, snp.all, phes, B = 1000, folds = 10,
   
   emp_stats_null = rowMeans(stats, na.rm = TRUE)
   return(emp_stats_null)
+}
+
+
+
+## p-value for a specific model
+emp_null_perm <- function(K, S, snp.sp, phes, B = 1000, folds = 10, 
+                           test.type = 'ht2', method){
+  set.seed(1234)
+  
+  n = length(S)
+  
+  
+  test.stats = rep(0, folds)
+  cvlen = floor(n / folds)
+  cc = 1:n 
+  
+  ## defube high/low by train and calculate test score and average them
+  ## only permute phenotype S and phes
+  run = 0
+  stats = NULL
+  repeat{
+    run = run + 1
+    perm.id = sample(1:n, n)
+    perm.phes = phes[perm.id, ]
+    perm.S = S[perm.id]
+    
+    for(j in 1:folds){
+      testid = ((j - 1) * cvlen + 1) : (j * cvlen)
+      trainid = cc[-testid]
+      temp.result = qmdr(trainid, testid, snp.sp, perm.S, perm.phes, test.type, method)
+      test.stats[j] = temp.result$test.stat
+    }  
+    
+    stats = c(stats, mean(test.stats))
+    if(run == B) break
+  }
+  return(stats)
 }
 
 
@@ -267,18 +304,12 @@ multi_qmdr <- function(phes, snp.mat, method = 'FPC', K = 2, nperm = 1000, test.
   
   perm.pv = NULL
   if(nperm > 0){
-    nperm = max(1, ceiling(nperm/ns))
-    emp_stats_null = emp_null_perm(K, SS, snp.all = snp.mat, 
-                                   phes, B = nperm, folds = kfolds, test.type, method)
-    perm.pv = mean(ifelse(emp_stats_null > model.score, 1, 0))
+      #emp_stats_null = emp_null_perm0(K, SS, snp.all = snp.mat, 
+      #                                phes, B = max(1, ceiling(nperm/ns)) folds = kfolds, test.type, method)
+      emp_stats_null = emp_null_perm(K, SS, snp.sp = snp.mat[, best.ksnps], 
+                                     phes, B = nperm, folds = kfolds, test.type, method)
+      perm.pv = mean(ifelse(emp_stats_null > model.score, 1, 0))
   }
-  
-  
-  #perm.pv = permute_pv(tscore = model.score, loci = best.ksnps, SS, snp.all = snp.mat, 
-  #                     phes, B = nperm, folds = 10, test.type, method)
-  
-  
-  
   
   res = list('best_ksnps' = best.ksnps, 'cvc' = model.cons, 'score' = model.score, 'pv' = perm.pv)
   return(res)
@@ -346,7 +377,6 @@ summary_score <- function(phes, method){
   }
   return(SS)
 }
-
 
 
 
